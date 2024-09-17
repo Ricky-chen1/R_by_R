@@ -28,9 +28,9 @@ _testmain.go
 *.sublime-project
 *.sublime-workspace
 !.gitkeep
-.DS_Store
+**/.DS_Store
 /.idea
 /.vscode
 /output
 *.local.yml
-dumped_hertz_remote_config.json
+**/__pycache__/
