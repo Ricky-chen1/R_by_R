@@ -1,11 +1,17 @@
 # game.py
 import pygame
 import random
-from constants import BG_COLOR, ROWS, COLS, TILE_SIZE, WIDTH, HEIGHT
+
+from constants import BLACK, ROWS, COLS, TILE_SIZE, WIDTH, HEIGHT, EASY_TIME_LIMIT, NORMAL_TIME_LIMIT
+from constants import EASY_SLOT_CAP, NORMAL_SLOT_CAP
 
 class Game:
-    def __init__(self, screen):
+    def __init__(self, screen, difficulty='easy'):
         self.screen = screen
+        self.difficulty = difficulty
+
+        self.time_limit = EASY_TIME_LIMIT if difficulty == 'easy' else NORMAL_TIME_LIMIT
+        self.slot_capacity = EASY_SLOT_CAP if difficulty == 'easy' else NORMAL_SLOT_CAP
         # 加载并缩放游戏图案，消除背景
         self.patterns = [pygame.image.load(f"../images/animal_{i}.png").convert_alpha() for i in range(1, 7)]
         for pattern in self.patterns:
@@ -18,8 +24,8 @@ class Game:
         # 初始化游戏板（随机堆叠的卡片）
         self.board_layers = self.create_stacked_board()
 
-        # 初始化卡槽（最大5个槽位）
-        self.card_slot = [None] * 6  # 用于保存选中图案的卡槽列表
+        # 初始化卡槽（最大6个槽位）
+        self.card_slot = [None] * self.slot_capacity # 用于保存选中图案的卡槽列表
 
         # 加载并缩放背景图片以填满屏幕
         self.background = pygame.image.load("../images/background.png")
@@ -33,7 +39,6 @@ class Game:
         self.card_slot_rect = pygame.Rect(50, HEIGHT - 150, WIDTH - 100, 100)  # 位置在屏幕底部
 
         # 初始化倒计时
-        self.time_limit = 120  # 倒计时时间，单位为秒
         self.start_ticks = pygame.time.get_ticks()
 
         # 加载成功和失败的背景图片
@@ -43,35 +48,7 @@ class Game:
         self.failure_background = pygame.transform.scale(self.failure_background, (WIDTH, HEIGHT))
 
     def reset(self):
-        # 加载并缩放游戏图案，消除背景
-        self.patterns = [pygame.image.load(f"../data/animal_{i}.png").convert_alpha() for i in range(1, 7)]
-        for pattern in self.patterns:
-            pattern.set_colorkey((255, 255, 255))  # 假设白色背景需要消除
-        self.patterns = [pygame.transform.scale(p, (TILE_SIZE, TILE_SIZE)) for p in self.patterns]
-
-        # 为每个图案创建掩码
-        self.masks = [pygame.mask.from_surface(pattern) for pattern in self.patterns]
-
-        # 初始化游戏板（随机堆叠的卡片）
-        self.board_layers = self.create_stacked_board()
-
-        # 初始化卡槽（最大5个槽位）
-        self.card_slot = [None] * 6  # 用于保存选中图案的卡槽列表
-
-        # 加载并缩放背景图片以填满屏幕
-        self.background = pygame.image.load("../images/background.png")
-        self.background = pygame.transform.scale(self.background, (WIDTH, HEIGHT))
-
-        # 计算偏移量以居中游戏网格
-        self.grid_offset_x = (WIDTH - (COLS * TILE_SIZE)) // 2
-        self.grid_offset_y = (HEIGHT - (ROWS * TILE_SIZE)) // 2
-
-        # 定义卡槽位置
-        self.card_slot_rect = pygame.Rect(50, HEIGHT - 150, WIDTH - 100, 100)  # 位置在屏幕底部
-
-        # 初始化倒计时
-        self.time_limit = 120  # 倒计时时间，单位为秒
-        self.start_ticks = pygame.time.get_ticks()
+        self.__init__(self.screen, self.difficulty)
 
     def create_stacked_board(self):
         num_tiles = ROWS * COLS
@@ -206,8 +183,8 @@ class Game:
 
                     if tile_rect.collidepoint(mouse_x, mouse_y) and not hovered_tile:
                         hovered_tile = tile_rect
-                        # 悬停时给卡牌加上黄色边框
-                        pygame.draw.rect(self.screen, (255, 255, 0), tile_rect, 3)
+                        # 悬停时给卡牌加上红色边框（没有效果）
+                        pygame.draw.rect(self.screen, (255,0, 0), tile_rect, 10)
 
                     self.screen.blit(tile, (x, y))  # 显示卡牌
 
@@ -282,5 +259,24 @@ class Game:
         # 计算文本位置
         text_rect = text_surface.get_rect(center=(WIDTH // 2, HEIGHT // 2))
         self.screen.blit(text_surface, text_rect)
+
+        # 添加返回主菜单的提示
+        font_small = pygame.font.SysFont(None, 36)
+        menu_text = font_small.render("Press Enter to return to the main menu", True, BLACK)
+        menu_text_rect = menu_text.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 100))
+        self.screen.blit(menu_text, menu_text_rect)
+
         pygame.display.flip()
-        pygame.time.wait(3000)  # 等待3秒
+
+        # 等待玩家按下回车键返回主菜单
+        self.wait_for_menu_selection()
+
+    def wait_for_menu_selection(self):
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    exit()
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_RETURN:  # 按下回车键返回主菜单
+                        return

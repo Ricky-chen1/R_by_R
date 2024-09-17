@@ -1,4 +1,3 @@
-# main.py
 import pygame
 from constants import WIDTH, HEIGHT
 from menu import Menu
@@ -9,10 +8,10 @@ def main():
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("R了个R")
 
-    # 创建 Menu 和 Game 实例
+    # 创建 Menu 实例
     menu = Menu(screen)
-    game = Game(screen)
-    game_state = 'menu'  # 初始状态
+    game = None
+    game_state = 'main_menu'  # 初始状态
 
     running = True
     while running:
@@ -21,8 +20,9 @@ def main():
                 running = False
 
             # 处理不同状态的事件
-            if game_state == 'menu':
-                game_state = menu.handle_event(event)
+            game_state = menu.handle_event(event, game_state)
+            if game_state == 'playing' and game is None:
+                game = Game(screen, menu.selected_difficulty)
             elif game_state == 'playing':
                 game.handle_event(event)
 
@@ -34,20 +34,20 @@ def main():
                 game_state = 'game_over'
 
         # 绘制当前状态
-        if game_state == 'menu':
-            menu.draw()
+        if game_state == 'main_menu':
+            menu.draw_main_menu()
+        elif game_state == 'difficulty_menu':
+            menu.draw_difficulty_menu()
         elif game_state == 'playing':
             game.draw()
         elif game_state == 'game_over':
             game.show_game_over_screen(win=False)
-            pygame.time.wait(2000)  # 停留2秒
-            game.reset()  # 重置游戏
-            game_state = 'menu'  # 返回主菜单
+            game = None  # 重置游戏实例
+            game_state = 'main_menu'  # 返回主菜单
         elif game_state == 'game_success':
             game.show_game_over_screen(win=True)
-            pygame.time.wait(2000)  # 停留2秒
-            game.reset()  # 重置游戏
-            game_state = 'menu'  # 返回主菜单
+            game = None  # 重置游戏实例
+            game_state = 'main_menu'  # 返回主菜单
 
         pygame.display.flip()
 
