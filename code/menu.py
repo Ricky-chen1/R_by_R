@@ -1,19 +1,18 @@
 # menu.py
 import pygame
-
 from rank import Leaderboard
-from constants import NORMAL_FONT_SIZE, SMALL_FONT_SIZE
-from constants import BUTTON_WIDTH, BUTTON_HEIGHT
-from constants import WIDTH, HEIGHT, WHITE, BLACK
+from constants import NORMAL_FONT_SIZE, SMALL_FONT_SIZE, BUTTON_WIDTH, BUTTON_HEIGHT, WIDTH, HEIGHT, WHITE, BLACK
 
 class Menu:
     def __init__(self, screen):
         self.screen = screen
-        self.font = pygame.font.SysFont(None, NORMAL_FONT_SIZE)
-        self.small_font = pygame.font.SysFont(None, SMALL_FONT_SIZE)
+        self.font = pygame.font.SysFont('Arial', NORMAL_FONT_SIZE, bold=True)
+        self.small_font = pygame.font.SysFont('Arial', SMALL_FONT_SIZE)
         self.selected_difficulty = 'easy'  # 默认选择easy
         self.background = pygame.image.load("../images/background.png")
         self.background = pygame.transform.scale(self.background, (WIDTH, HEIGHT))
+        self.rank_background = pygame.image.load("../images/rank_background.png")
+        self.rank_background = pygame.transform.scale(self.rank_background, (WIDTH, HEIGHT))
         self.start_button = None
         self.easy_button = None
         self.normal_button = None
@@ -25,7 +24,7 @@ class Menu:
         self.leaderboard_button = None
 
         self.return_button = None  # 添加返回主菜单按钮
-        self.exit_button = None # 添加退出游戏按钮
+        self.exit_button = None  # 添加退出按钮
 
     def draw_button(self, text, center, width, height):
         button_rect = pygame.Rect(0, 0, width, height)
@@ -38,6 +37,19 @@ class Menu:
         self.screen.blit(text_surface, text_rect)
 
         return button_rect
+
+    def draw_main_menu(self):
+        self.screen.blit(self.background, (0, 0))  # 绘制背景图片
+        title_font = pygame.font.SysFont('Comic Sans MS', 72, bold=True)
+        title = title_font.render("R by R", True, (0, 128, 0))
+        title_rect = title.get_rect(center=(WIDTH // 2, HEIGHT // 4 - 50))
+        self.screen.blit(title, title_rect)
+
+        self.start_button = self.draw_button("Start Game", (WIDTH // 2, HEIGHT // 2 - 100), BUTTON_WIDTH, BUTTON_HEIGHT)
+        self.leaderboard_button = self.draw_button("Rank", (WIDTH // 2, HEIGHT // 2 + 50), BUTTON_WIDTH, BUTTON_HEIGHT)
+        self.exit_button = self.draw_button("Exit", (WIDTH // 2, HEIGHT // 2 + 200), BUTTON_WIDTH, BUTTON_HEIGHT)
+
+        pygame.display.flip()
 
     def draw_name_input(self):
         self.screen.blit(self.background, (0, 0))  # 绘制背景图片
@@ -58,20 +70,8 @@ class Menu:
         self.start_button = self.draw_button("Next", (WIDTH // 2, HEIGHT // 2 + 50), BUTTON_WIDTH, BUTTON_HEIGHT)
         self.return_button = self.draw_button("Back", (WIDTH // 2, HEIGHT // 2 + 200), BUTTON_WIDTH, BUTTON_HEIGHT)
 
-    def draw_main_menu(self):
-        self.screen.blit(self.background, (0, 0))  # 绘制背景图片
-        title = self.font.render("R by R", True, BLACK)
-        title_rect = title.get_rect(center=(WIDTH // 2, HEIGHT // 4 - 50))
-        self.screen.blit(title, title_rect)
-
-        self.start_button = self.draw_button("Start Game", (WIDTH // 2, HEIGHT // 2 - 100), BUTTON_WIDTH, BUTTON_HEIGHT)
-        self.leaderboard_button = self.draw_button("Rank", (WIDTH // 2, HEIGHT // 2 + 50), BUTTON_WIDTH, BUTTON_HEIGHT)
-        self.exit_button = self.draw_button("Exit", (WIDTH // 2, HEIGHT // 2 + 200), BUTTON_WIDTH, BUTTON_HEIGHT)
-
-        pygame.display.flip()
-
     def draw_leaderboard(self):
-        self.screen.blit(self.background, (0, 0))  # 绘制背景图片
+        self.screen.blit(self.rank_background, (0, 0))  # 绘制背景图片
         title = self.font.render("Rank", True, BLACK)
         title_rect = title.get_rect(center=(WIDTH // 2, HEIGHT // 4))
         self.screen.blit(title, title_rect)
@@ -80,10 +80,10 @@ class Menu:
         for i, entry in enumerate(top_entries):
             entry_text = f"{i + 1}. {entry['name']} - {entry['time']}s - {entry['difficulty']}"
             entry_surface = self.small_font.render(entry_text, True, BLACK)
-            entry_rect = entry_surface.get_rect(center=(WIDTH // 2, HEIGHT // 2 + i * 30))
+            entry_rect = entry_surface.get_rect(center=(WIDTH // 2, HEIGHT // 2 - 100 + i * 50))
             self.screen.blit(entry_surface, entry_rect)
 
-        self.return_button = self.draw_button("Return to Main Menu", (WIDTH // 2, HEIGHT - 100), BUTTON_WIDTH,
+        self.return_button = self.draw_button("Back", (WIDTH // 2, HEIGHT - 100), BUTTON_WIDTH,
                                               BUTTON_HEIGHT)
 
         pygame.display.flip()

@@ -2,7 +2,7 @@
 import pygame
 import random
 
-from constants import BLACK, ROWS, COLS, TILE_SIZE, WIDTH, HEIGHT, EASY_TIME_LIMIT, NORMAL_TIME_LIMIT
+from constants import WHITE, ROWS, COLS, TILE_SIZE, WIDTH, HEIGHT, EASY_TIME_LIMIT, NORMAL_TIME_LIMIT,SMALL_FONT_SIZE
 from constants import EASY_SLOT_CAP, NORMAL_SLOT_CAP
 
 class Game:
@@ -42,9 +42,9 @@ class Game:
         self.start_ticks = pygame.time.get_ticks()
 
         # 加载成功和失败的背景图片
-        self.success_background = pygame.image.load("../images/background.png")
+        self.success_background = pygame.image.load("../images/success_background.png")
         self.success_background = pygame.transform.scale(self.success_background, (WIDTH, HEIGHT))
-        self.failure_background = pygame.image.load("../images/background.png")
+        self.failure_background = pygame.image.load("../images/failure_background.png")
         self.failure_background = pygame.transform.scale(self.failure_background, (WIDTH, HEIGHT))
 
     def reset(self):
@@ -249,25 +249,13 @@ class Game:
         # 显示成功或失败的背景图片
         if win:
             self.screen.blit(self.success_background, (0, 0))
-            text = "You Win!"
-            color = (0, 255, 0)  # 绿色
         else:
             self.screen.blit(self.failure_background, (0, 0))
-            text = "Game Over"
-            color = (255, 0, 0)  # 红色
-
-        # 定义字体和颜色
-        font = pygame.font.SysFont(None, 74)
-        text_surface = font.render(text, True, color)
-
-        # 计算文本位置
-        text_rect = text_surface.get_rect(center=(WIDTH // 2, HEIGHT // 2))
-        self.screen.blit(text_surface, text_rect)
 
         # 添加返回主菜单的提示
-        font_small = pygame.font.SysFont(None, 36)
-        menu_text = font_small.render("Press Enter to return to the main menu", True, BLACK)
-        menu_text_rect = menu_text.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 100))
+        font_small = pygame.font.SysFont(None, SMALL_FONT_SIZE)
+        menu_text = font_small.render("Press Enter to return to the main menu", True, WHITE)
+        menu_text_rect = menu_text.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 150))
         self.screen.blit(menu_text, menu_text_rect)
 
         pygame.display.flip()

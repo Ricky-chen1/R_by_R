@@ -18,6 +18,9 @@ class Leaderboard:
         with open(self.filename, 'w') as file:
             json.dump(self.data, file, indent=4)
 
+    def clear(self):
+        self.data = []
+
     def add_entry(self, name, time, difficulty):
         difficulty_priority = {'normal': 0, 'easy': 1}
         self.data.append({'name': name, 'time': time, 'difficulty': difficulty})
