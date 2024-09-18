@@ -102,6 +102,10 @@ class Game:
         pygame.quit()
         exit()
 
+    def get_elapsed_time(self):
+        elapsed_time = (pygame.time.get_ticks() - self.start_ticks) / 1000
+        return elapsed_time
+
     def handle_event(self, event):
         # 处理游戏相关事件
         if event.type == pygame.MOUSEBUTTONDOWN:
